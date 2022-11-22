@@ -14,7 +14,18 @@ using namespace std;
 
 //************************** Node *************************
 
-class Node;
+class Node {
+	public:
+	Node(int value);
+
+	private:
+	int number;
+	Node* next;
+};
+
+Node::Node(int value) {
+	this->number = value;
+}
 
 //************************** Graph ****************************
 class Graph {
