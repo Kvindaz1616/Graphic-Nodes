@@ -1,7 +1,9 @@
 /**************************
- *
- * HEADER
- *
+ *KEVIN DIAZ
+  CSC-141 
+  MFW 1:00-1:50PM
+ WINDOWS 10 VISUAL STUDIO CODE
+ PROGRAM 6 GRAPHS
  * ************************/
 
 #include <iostream>
