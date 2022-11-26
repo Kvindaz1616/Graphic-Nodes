@@ -85,54 +85,54 @@ void Graph::dumpGraph(string adjListFileName) {
 	//writes the adjacency list into the file
 	ofstream outFile;
 	outFile.open(adjListFileName);
-	if (outFile.is_open()) {
-		for (int i = 0; i < vertices.size(); i++) {
-			outFile << vertices[i]->number << " ";
-			Node* temp = vertices[i]->next;
-			while (temp != NULL) {
-				outFile << temp->number << " ";
-				temp = temp->next;
+	if (outFile.is_open()) { //check if file is open
+		for (int i = 0; i < vertices.size(); i++) { //loop through vertices
+			outFile << vertices[i]->number << " "; //write the number of the node
+			Node* temp = vertices[i]->next; //create a temp node and set it to the next of the node
+			while (temp != NULL) { //while the temp node is not null
+				outFile << temp->number << " "; //write the number of the temp node
+				temp = temp->next; //set the temp node to the next of the temp node
 			}
-			outFile << endl;
+			outFile << endl; //write a new line
 		}
 	}
-}
-
-void Graph::printGraphInfo(){
-	//Prints number of nodes, number of edges, and maximum degree on terminal
-	int numNodes = getNumVertices();
-	int numEdges = 0;
-	int maxDegree = 0;
-	for (int i = 0; i < vertices.size(); i++) {
-		int degree = getNumNeighbors(vertices[i]->number);
-		if (degree > maxDegree) {
-			maxDegree = degree;
-		}
-		numEdges += degree;
-	}
-	cout << "Number of nodes: " << numNodes << endl;
-	cout << "Number of edges: " << numEdges << endl;
-	cout << "Maximum degree: " << maxDegree << endl;
-}
-
-int Graph::getNumNeighbors(int nodeId) {
-	//returns the number of neighbor (degree) of a node
-	int degree = 0;
-	for (int i = 0; i < vertices.size(); i++) {
-		if (vertices[i]->number == nodeId) {
-			Node* temp = vertices[i]->next;
-			while (temp != NULL) {
-				degree++;
-				temp = temp->next;
-			}
-		}
-	}
-	return degree;
 }
 
 int Graph::getNumVertices() {
 	//returns the number of nodes in the graph
 	return vertices.size();
+}
+
+int Graph::getNumNeighbors(int nodeId) {
+	//returns the number of neighbor (degree) of a node
+	int numNeighbors = 0; //set the number of neighbors to 0
+	for (int i = 0; i < vertices.size(); i++) { //loop through vertices
+		if (vertices[i]->number == nodeId) { //if verticies at i is equal to the node id
+			Node* temp = vertices[i]->next; //create a temp node and set it to the next of the node
+			while (temp != NULL) { //while the temp node is not null
+				numNeighbors++; //increment the number of neighbors
+				temp = temp->next; //set the temp node to the next of the temp node
+			}
+		}
+	}
+	return numNeighbors; //return the number of neighbors
+}
+
+void Graph::printGraphInfo(){
+	//Prints number of nodes, number of edges, and maximum degree on terminal
+	int numNodes = getNumVertices(); //get the number of nodes
+	int numEdges = 0; //set the number of edges to 0
+	int maxDegree = 0; //set the max degree to 0
+	for (int i = 0; i < vertices.size(); i++) { //loop through vertices
+		int degree = getNumNeighbors(vertices[i]->number); //get the degree of the node at i
+		if (degree > maxDegree) { //if the degree is greater than the max degree
+			maxDegree = degree; //set the max degree to the degree
+		}
+		numEdges += degree; //increment the number of edges by the degree
+	}
+	cout << "Number of nodes: " << numNodes << endl;
+	cout << "Number of edges: " << numEdges << endl;
+	cout << "Maximum degree: " << maxDegree << endl;
 }
 
 void run(string edgeListFileName, string adjListFileName) {
