@@ -136,6 +136,10 @@ int Graph::getNumVertices() {
 }
 
 void run(string edgeListFileName, string adjListFileName) {
+	Graph graph;
+	graph.loadGraph(edgeListFileName);
+	graph.dumpGraph(adjListFileName);
+	graph.printGraphInfo();
 }
 
 //*****************************************************************************
