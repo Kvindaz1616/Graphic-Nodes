@@ -68,32 +68,57 @@ void Graph::addNeighbor(int nodeId, int neighborId) {
 }
 
 void Graph::loadGraph(string edgelistFileName){
-	//reads the edge list from the file and creates the adjacency list data structure
+	//reads the edge list from the file and use it to make a vector of linked lists
 	ifstream inFile;
 	inFile.open(edgelistFileName);
 	if (inFile.is_open()) {
-		int nodeId;
-		int neighborId;
-		while (inFile >> nodeId >> neighborId) {
-			//add the node with neighborId as the neighbor of nodeId
-			addNeighbor(nodeId, neighborId);
+		int node1;
+		int node2;
+		
+		while (inFile >> node1 >> node2) {
+			//check if the node1 is already in the vector
+			bool node1Found = false;
+			for (int i = 0; i < vertices.size(); i++) {
+				if (vertices[i]->number == node1) {
+					node1Found = true;
+				}
+			}
+			//if the node1 is not in the vector, add it
+			if (!node1Found) {
+				Node* newNode = new Node(node1);
+				vertices.push_back(newNode);
+			}
+			//check if the node2 is already in the vector
+			bool node2Found = false;
+			for (int i = 0; i < vertices.size(); i++) {
+				if (vertices[i]->number == node2) {
+					node2Found = true;
+				}
+			}
+			//if the node2 is not in the vector, add it
+			if (!node2Found) {
+				Node* newNode = new Node(node2);
+				vertices.push_back(newNode);
+			}
+			//add the neighbor to the node
+			addNeighbor(node1, node2);
 		}
 	}
 }
 
 void Graph::dumpGraph(string adjListFileName) {
-	//writes the adjacency list into the file
+	//read the vector created within loadGraph and for each element in the vector, print the whole linked list connected to it
 	ofstream outFile;
 	outFile.open(adjListFileName);
-	if (outFile.is_open()) { //check if file is open
-		for (int i = 0; i < vertices.size(); i++) { //loop through vertices
-			outFile << vertices[i]->number << " "; //write the number of the node
-			Node* temp = vertices[i]->next; //create a temp node and set it to the next of the node
-			while (temp != NULL) { //while the temp node is not null
-				outFile << temp->number << " "; //write the number of the temp node
-				temp = temp->next; //set the temp node to the next of the temp node
+	if (outFile.is_open()) {
+		for (int i = 0; i < vertices.size(); i++) {
+			outFile << vertices[i]->number << " ";
+			Node* temp = vertices[i]->next;
+			while (temp != NULL) {
+				outFile << temp->number << " ";
+				temp = temp->next;
 			}
-			outFile << endl; //write a new line
+			outFile << endl;
 		}
 	}
 }
