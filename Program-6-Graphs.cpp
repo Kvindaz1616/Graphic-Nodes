@@ -8,6 +8,7 @@
 
 #include <iostream>
 #include <fstream>
+#include <cassert>
 #include <vector>
 
 using namespace std;
@@ -16,15 +17,14 @@ using namespace std;
 
 class Node {
 	public:
-	Node(int value);
-
-	private:
-	int number;
-	Node* next;
+	int id;
+	Node* link;
+	Node (int id);
 };
 
-Node::Node(int value) {
-	this->number = value;
+Node::Node (int id) {
+	this->id = id;
+	link = NULL;
 }
 
 //************************** Graph ****************************
@@ -55,116 +55,134 @@ class Graph {
 
 void Graph::addNeighbor(int nodeId, int neighborId) {
 	//loop through verticies and find the node with the id of nodeId
-	for (int i = 0; i < vertices.size(); i++) {
-		if (vertices[i]->number == nodeId) {
-			//create a new node with the neighborId
-			Node* newNode = new Node(neighborId);
-			//set the next of the new node to the next of the node with the id of nodeId
-			newNode->next = vertices[i]->next;
-			//set the next of the node with the id of nodeId to the new node
-			vertices[i]->next = newNode;
+	Node* temp = vertices.at(nodeId); //temp is the node with the id of nodeId
+	if (temp->id == neighborId) { //if the node is already a neighbor, do nothing
+		return;
+	}
+
+	if (temp->id > neighborId) { //if the neighborId is less than the id of the node, add the neighborId to the front of the list
+		Node* newNode = new Node(neighborId); //create a new node with the id of neighborId
+		Node* temp2 = temp->link; //temp2 is the next node in the list
+		newNode->link = temp; //set the link of the new node to the node with the id of nodeId
+		vertices[nodeId] = newNode; //set the node with the id of nodeId to the new node
+	}
+	else{
+		bool done = false; //done is false
+		while (temp->link !=NULL && !done) { //while the next node in the list is not null and done is false
+			if (temp->link->id == neighborId) { //if the next node in the list is the neighborId, do nothing
+				done = true; //set done to true
+			}
+			else if (temp->link->id <neighborId){ //if the next node in the list is less than the neighborId, move to the next node in the list
+				temp = temp->link; //set temp to the next node in the list
+				done = false; //set done to false
+			}
+			else if (temp->link->id > neighborId) { //if the next node in the list is greater than the neighborId, add the neighborId to the list
+				Node* newNode = new Node(neighborId); //create a new node with the id of neighborId
+				Node* temp2 = temp->link; //temp2 is the next node in the list
+				newNode->link = temp2; //set the link of the new node to the next node in the list
+				temp->link = newNode; // set the link of the node with the id of nodeId to the new node
+				done = true; //set done to true
+			}
+		}
+		if (temp->link == NULL && !done) { //if the next node in the list is null and done is false, add the neighborId to the end of the list
+			Node* newNode = new Node(neighborId); //create a new node with the id of neighborId
+			temp->link = newNode; //set the link of the node with the id of nodeId to the new node
 		}
 	}
 }
 
-void Graph::loadGraph(string edgelistFileName){
-	//reads the edge list from the file and use it to make a vector of linked lists
-	ifstream inFile;
-	inFile.open(edgelistFileName);
-	if (inFile.is_open()) {
-		int node1;
-		int node2;
-		
-		while (inFile >> node1 >> node2) {
-			//check if the node1 is already in the vector
-			bool node1Found = false;
-			for (int i = 0; i < vertices.size(); i++) {
-				if (vertices[i]->number == node1) {
-					node1Found = true;
-				}
+void Graph::loadGraph(string edgelistFileName){ //reads the edge list from file and creates the adjacency list data structure
+
+	ifstream inFile; //create an input file stream
+	int node1=0; //node1 is the first node in the edge
+	int node2=0; //node2 is the second node in the edge
+	inFile.open(edgelistFileName); //open the file
+	assert(inFile.fail()==false); //assert that the file opened successfully
+	while (!(inFile.eof())){ //while the end of the file has not been reached
+		inFile >> node1; //read the first node in the edge
+		inFile >> node2; //read the second node in the edge
+		if (node1 >= node2){
+			while (node1 >= vertices.size()){ //while the size of the vector is less than the first node in the edge
+				vertices.push_back(NULL); //add a null node to the vector
 			}
-			//if the node1 is not in the vector, add it
-			if (!node1Found) {
-				Node* newNode = new Node(node1);
-				vertices.push_back(newNode);
+		}
+
+		else {
+			while (node2 >= vertices.size()){ //while the size of the vector is less than the second node in the edge
+				vertices.push_back(NULL); //add a null node to the vector
 			}
-			//check if the node2 is already in the vector
-			bool node2Found = false;
-			for (int i = 0; i < vertices.size(); i++) {
-				if (vertices[i]->number == node2) {
-					node2Found = true;
-				}
-			}
-			//if the node2 is not in the vector, add it
-			if (!node2Found) {
-				Node* newNode = new Node(node2);
-				vertices.push_back(newNode);
-			}
-			//add the neighbor to the node
-			addNeighbor(node1, node2);
+		}
+
+		if (vertices.at(node1) == NULL){ //if the node with the id of node1 is null
+			Node* newNode = new Node(node2); //create a new node with the id of node2
+			vertices.at(node1) = newNode; //set the node with the id of node1 to the new node
+		}
+
+		else {
+			addNeighbor(node1, node2); //add the node with the id of node2 as the neighbor of the node with the id of node1
+		}
+
+		if (vertices.at(node2) == NULL){ //if the node with the id of node2 is null
+			Node* newNode = new Node(node1); //create a new node with the id of node1
+			vertices.at(node2) = newNode; //set the node with the id of node2 to the new node
+		}
+
+		else {
+			addNeighbor(node2, node1); //add the node with the id of node1 as the neighbor of the node with the id of node2
 		}
 	}
+	inFile.close(); //close the file
 }
 
 void Graph::dumpGraph(string adjListFileName) {
-	//read the vector created within loadGraph and for each element in the vector, print the whole linked list connected to it
-	ofstream outFile;
-	outFile.open(adjListFileName);
-	if (outFile.is_open()) {
-		for (int i = 0; i < vertices.size(); i++) {
-			outFile << vertices[i]->number << " ";
-			Node* temp = vertices[i]->next;
-			while (temp != NULL) {
-				outFile << temp->number << " ";
-				temp = temp->next;
-			}
-			outFile << endl;
-		}
-	}
+
 }
 
 int Graph::getNumVertices() {
 	//returns the number of nodes in the graph
-	return vertices.size();
+	int numVertices = 0; //numVertices is the number of nodes in the graph
+	for (int i =0; i < vertices.size(); i++){ //loop through the vector
+		if (vertices.at(i) != NULL){ //if the node is not null
+			numVertices++; // increment numVertices
+		}
+	}
+	return numVertices; //return numVertices
 }
 
 int Graph::getNumNeighbors(int nodeId) {
 	//returns the number of neighbor (degree) of a node
-	int numNeighbors = 0; //set the number of neighbors to 0
-	for (int i = 0; i < vertices.size(); i++) { //loop through vertices
-		if (vertices[i]->number == nodeId) { //if verticies at i is equal to the node id
-			Node* temp = vertices[i]->next; //create a temp node and set it to the next of the node
-			while (temp != NULL) { //while the temp node is not null
-				numNeighbors++; //increment the number of neighbors
-				temp = temp->next; //set the temp node to the next of the temp node
-			}
-		}
+	int numNeighbors = 0; //numNeighbors is the number of neighbors of a node
+	Node* temp = vertices.at(nodeId); //temp is the node with the id of nodeId
+	while (temp != NULL){ //while temp is not null
+		numNeighbors++; //increment numNeighbors
+		temp = temp->link; //set temp to the next node in the list
 	}
-	return numNeighbors; //return the number of neighbors
+	return numNeighbors; //return numNeighbors
 }
 
 void Graph::printGraphInfo(){
 	//Prints number of nodes, number of edges, and maximum degree on terminal
-	int numNodes = getNumVertices(); //get the number of nodes
-	int numEdges = 0; //set the number of edges to 0
-	int maxDegree = 0; //set the max degree to 0
-	for (int i = 0; i < vertices.size(); i++) { //loop through vertices
-		int degree = getNumNeighbors(vertices[i]->number); //get the degree of the node at i
-		if (degree > maxDegree) { //if the degree is greater than the max degree
-			maxDegree = degree; //set the max degree to the degree
+	int numNodes = getNumVertices(); //numNodes is the number of nodes in the graph
+	int numEdges = 0; //numEdges is the number of edges in the graph
+	int maxDegree = 0; //maxDegree is the maximum degree of a node in the graph
+	for (int i = 0; i < vertices.size(); i++){ //loop through the vector
+		int numNeighbors = getNumNeighbors(i); //numNeighbors is the number of neighbors of the node with the id of i
+		if (numNeighbors > maxDegree) { //if numNeighbors is greater than maxDegree
+			maxDegree = numNeighbors; //set maxDegree to numNeighbors
 		}
-		numEdges += degree; //increment the number of edges by the degree
+		numEdges += numNeighbors; //increment numEdges by numNeighbors
 	}
-	cout << "Number of nodes: " << numNodes << endl;
-	cout << "Number of edges: " << numEdges << endl;
-	cout << "Maximum degree: " << maxDegree << endl;
+	numEdges = numEdges/2; //divide numEdges by 2
+	cout << "Number of nodes: " << numNodes << endl; //print the number of nodes
+	cout << "Number of edges: " << numEdges << endl; //print the number of edges
+	cout << "Maximum degree: " << maxDegree << endl; //print the maximum degree
 }
 
 void run(string edgeListFileName, string adjListFileName) {
-	Graph graph;
-	graph.loadGraph(edgeListFileName);
-	graph.dumpGraph(adjListFileName);
-	graph.printGraphInfo();
+	Graph g;
+	g.loadGraph(edgeListFileName);
+	//g.dumpGraph(adjListFileName);
+	g.printGraphInfo();
 }
 
 //*****************************************************************************

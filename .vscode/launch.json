@@ -8,8 +8,8 @@
       "args": [],
       "stopAtEntry": false,
       "externalConsole": true,
-      "cwd": "c:/Users/kvind/OneDrive/Desktop/csc-141-projects/Program6/Program6-1",
-      "program": "c:/Users/kvind/OneDrive/Desktop/csc-141-projects/Program6/Program6-1/build/Debug/outDebug",
+      "cwd": "c:/Users/kvind/OneDrive/Desktop/CSC-141/PROGRAM6",
+      "program": "c:/Users/kvind/OneDrive/Desktop/CSC-141/PROGRAM6/build/Debug/outDebug",
       "MIMode": "gdb",
       "miDebuggerPath": "gdb",
       "setupCommands": [
