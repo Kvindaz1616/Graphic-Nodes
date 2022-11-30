@@ -135,7 +135,24 @@ void Graph::loadGraph(string edgelistFileName){ //reads the edge list from file 
 }
 
 void Graph::dumpGraph(string adjListFileName) {
-
+	//write the adjacency list to the file by reading it in
+	ifstream inFile; //create an input file stream
+	inFile.open(adjListFileName); //open the file
+	int counter = 1; //counter is 1
+	for (int i =0; i < vertices.size(); i++){ //for each node in the vector
+		if (vertices.at(i) != NULL){ //if the node is not null
+			cout << counter << ": "; //print the counter and a colon
+			cout << vertices.at(i)->id; //print the id of the node
+			Node* temp = vertices.at(i)->link; //temp is the next node in the list
+			while (temp != NULL){ //while temp is not null
+				cout << " " << temp->id; //print a space and the id of the node
+				temp = temp->link; //set temp to the next node in the list
+			}
+			counter++; //increment counter
+		}
+		cout << endl; //print a new line
+	}
+	inFile.close(); //close the file
 }
 
 int Graph::getNumVertices() {
@@ -153,7 +170,7 @@ int Graph::getNumNeighbors(int nodeId) {
 	//returns the number of neighbor (degree) of a node
 	int numNeighbors = 0; //numNeighbors is the number of neighbors of a node
 	Node* temp = vertices.at(nodeId); //temp is the node with the id of nodeId
-	while (temp != NULL){ //while temp is not null
+	while (temp != NULL){ //while the node is not null
 		numNeighbors++; //increment numNeighbors
 		temp = temp->link; //set temp to the next node in the list
 	}
@@ -181,7 +198,7 @@ void Graph::printGraphInfo(){
 void run(string edgeListFileName, string adjListFileName) {
 	Graph g;
 	g.loadGraph(edgeListFileName);
-	//g.dumpGraph(adjListFileName);
+	g.dumpGraph(adjListFileName);
 	g.printGraphInfo();
 }
 
