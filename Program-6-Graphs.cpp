@@ -134,24 +134,27 @@ void Graph::loadGraph(string edgelistFileName){ //reads the edge list from file 
 	inFile.close(); //close the file
 }
 
-void Graph::dumpGraph(string adjListFileName) {
-	//write the adjacency list to the file by reading it in
+void Graph::dumpGraph(string adjListFileName) {//write the adjacency list to the file by reading it in
 	ofstream outFile; //create an output file stream
 	outFile.open(adjListFileName); //open the file
 	assert(outFile.fail()==false); //assert that the file opened successfully
-	int counter = 1; //counter is 0
+	int counter = 0; //counter is 0
 	for (int i = 0; i < vertices.size(); i++){ //for each node in the vector
-		if (vertices.at(i) != NULL){ //if the node is not null
-		outFile << counter << ": "; //print the counter and a colon
-		outFile << vertices.at(i)->id; //print the id of the node
-		Node* temp = vertices.at(i)->link; //temp is the next node in the list
-		while (temp != NULL){ //while temp is not null
-			outFile << " " << temp->id; //print a space and the id of the node
-			temp = temp->link; //set temp to the next node in the list
-			}
-			counter++; //increment counter
-			outFile << endl; //print a new line
+		Node* temp = vertices.at(i); //temp is the node at index i
+		if (counter != 0 && temp != NULL){ //if counter is not 0 and temp is not null
+			outFile << counter << ": "; //write a new line to the file
 		}
+		while (temp != NULL){ //while temp is not null
+			outFile << temp->id; //write the id of temp to the file
+			temp = temp->link; //set temp to the next node in the list
+			if (temp != NULL){ //if temp is not null
+				outFile << " "; //write a space to the file
+			}
+			if (temp == NULL){ //if temp is null
+				outFile << endl; //write a new line to the file
+			}
+		}
+		counter++; //increment counter
 	}
 	outFile.close(); //close the file
 }
@@ -197,10 +200,10 @@ void Graph::printGraphInfo(){
 }
 
 void run(string edgeListFileName, string adjListFileName) {
-	Graph g;
-	g.loadGraph(edgeListFileName);
-	g.dumpGraph(adjListFileName);
-	g.printGraphInfo();
+	Graph Graph;
+	Graph.loadGraph(edgeListFileName);
+	Graph.dumpGraph(adjListFileName);
+	Graph.printGraphInfo();
 }
 
 //*****************************************************************************
